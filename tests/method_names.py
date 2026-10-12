@@ -47,21 +47,14 @@ with tempfile.TemporaryDirectory() as directory:
                 assert {k: a[k] for k in keys} == {k: b[k] for k in keys}
 
     (p / 'queries').write_text('{"query_id":0,"x":0,"y":2,"cost":1}\n')
-    samples = []
     for supplied in ('FDCut', 'fdcut', 'FDCUT'):
         label = 'FDCut'
         out = p / f'batch-{supplied}'
         summary = run([tool, 'solve-bin-batch', str(graph), str(p / 'queries'), str(out), supplied])
         assert summary['method'] == label
         assert json.loads(out.read_text())['query']['method'] == label
-        out = p / f'sample-{supplied}'
-        subprocess.run([tool, 'sample-bin-full', str(graph), str(out), '1', '42', '100', '1', supplied], check=True, capture_output=True, timeout=30)
-        sample = json.loads(out.read_text())
-        assert sample.pop('method') == label
-        samples.append(sample)
-    assert samples[0] == samples[1] == samples[2]
     for factory in factories:
         for invalid in ['not-a-method'] + [legacy for _, legacy in names]:
             failed = subprocess.run(factory(invalid), capture_output=True, text=True)
             assert failed.returncode != 0 and 'unknown method' in failed.stderr
-print('PASS paper names, case handling, rejected legacy aliases, limits, explicit/compact I/R, batch and sampling')
+print('PASS paper names, case handling, rejected legacy aliases, limits, explicit/compact I/R and batch')

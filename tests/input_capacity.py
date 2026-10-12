@@ -54,7 +54,7 @@ with tempfile.TemporaryDirectory(prefix="fd-binary-full-") as directory:
     samples = Path(directory) / "samples.jsonl"
     subprocess.run([
         binary, "sample-bin-full", str(graph), str(samples),
-        "1", "20260917", "100", "1", "FDCut",
+        "1", "20260917", "100", "1",
     ], check=True, capture_output=True, text=True)
     rows = [json.loads(line) for line in samples.read_text().splitlines()]
     assert len(rows) == 1
@@ -65,7 +65,7 @@ with tempfile.TemporaryDirectory(prefix="fd-binary-full-") as directory:
     root_samples = Path(directory) / "root-samples.jsonl"
     subprocess.run([
         binary, "sample-bin-full", str(graph), str(root_samples),
-        "1", "20260917", "100", "1", "FDCut", "root-x",
+        "1", "20260917", "100", "1", "root-x",
     ], check=True, capture_output=True, text=True)
     root_rows = [json.loads(line) for line in root_samples.read_text().splitlines()]
     assert len(root_rows) == 1 and root_rows[0]["x"] == 0
@@ -74,7 +74,7 @@ with tempfile.TemporaryDirectory(prefix="fd-binary-full-") as directory:
     pair_samples = Path(directory) / "pair-samples.jsonl"
     subprocess.run([
         binary, "sample-bin-full", str(graph), str(pair_samples),
-        "1", "20260917", "10000", "1", "FDCut", "random-pair",
+        "1", "20260917", "10000", "1", "random-pair",
     ], check=True, capture_output=True, text=True)
     pair_rows = [json.loads(line) for line in pair_samples.read_text().splitlines()]
     assert len(pair_rows) == 1 and pair_rows[0]["x"] == 0 and pair_rows[0]["y"] == 2
@@ -85,12 +85,24 @@ with tempfile.TemporaryDirectory(prefix="fd-binary-full-") as directory:
     parallel_samples = Path(directory) / "parallel-samples.jsonl"
     subprocess.run([
         binary, "sample-bin-full", str(graph), str(parallel_samples),
-        "1", "20260917", "10000", "1", "FDCut", "random-pair", "2",
+        "1", "20260917", "10000", "1", "random-pair", "2",
     ], check=True, capture_output=True, text=True)
     parallel_rows = [json.loads(line) for line in parallel_samples.read_text().splitlines()]
     assert len(parallel_rows) == 1
     assert parallel_rows[0]["x"] == 0 and parallel_rows[0]["y"] == 2
     assert parallel_rows[0]["threads"] == 2 and parallel_rows[0]["nonempty"]
+
+    for row in rows + root_rows + pair_rows + parallel_rows:
+        assert "method" not in row
+    # Removed method arguments must fail, not shift silently into another option.
+    for obsolete in ("FDCut", "base", "sweep"):
+        failed_output = Path(directory) / f"obsolete-{obsolete}.jsonl"
+        failed = subprocess.run([
+            binary, "sample-bin-full", str(graph), str(failed_output),
+            "1", "42", "100", "1", obsolete,
+        ], capture_output=True, text=True)
+        assert failed.returncode != 0 and "sampling mode" in failed.stderr
+        assert not failed_output.exists()
 
     batch_queries = Path(directory) / "batch-queries.jsonl"
     batch_queries.write_text(

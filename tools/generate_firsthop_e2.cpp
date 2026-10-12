@@ -5,7 +5,7 @@
 #include <sstream>
 
 int main(int argc,char**argv){try{
- if(argc!=6)throw std::runtime_error("usage: GRAPH OUTPUT SEED ATTEMPTS SECONDS");
+ if(argc!=6)throw std::runtime_error("usage: fdfirsthop GRAPH OUTPUT SEED ATTEMPTS SECONDS");
  const std::string output=argv[2],parts=output+".parts";
  if(std::filesystem::exists(output)||std::filesystem::exists(parts))throw std::runtime_error("refusing existing output/checkpoints");
  const u64 seed=number(argv[3],"seed"),limit=number(argv[4],"attempts"),seconds=number(argv[5],"seconds");

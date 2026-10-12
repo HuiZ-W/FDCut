@@ -35,6 +35,15 @@ with tempfile.TemporaryDirectory(prefix='fd-graph-formats-') as tmp:
     for i,bad in enumerate([data[:-1],data+b'X',b'NOTMAGIC'+data[8:]]):
         (p/'bad.bin').write_bytes(bad)
         assert subprocess.run([binary,'bin-to-txt',str(p/'bad.bin'),str(p/f'bad{i}.txt')],capture_output=True).returncode
+    for i, (mode, source, args) in enumerate([
+        ('txt-to-bin', 'in.txt', ['extra']),
+        ('bin-to-txt', 'out.bin', ['extra']),
+        ('raw-to-txt', 'raw', []),
+        ('raw-to-txt', 'raw', ['4294967300', 'invalid']),
+    ]):
+        dest = p / f'bad-args-{i}'
+        assert subprocess.run([binary, mode, str(p/source), str(dest), *args], capture_output=True).returncode
+        assert not dest.exists() and not pathlib.Path(str(dest)+'.partial').exists()
     (p/'empty.txt').write_text('5 0\n')
     subprocess.run([binary,'txt-to-bin',str(p/'empty.txt'),str(p/'empty.bin')],check=True)
     subprocess.run([binary,'bin-to-txt',str(p/'empty.bin'),str(p/'empty-back.txt')],check=True)

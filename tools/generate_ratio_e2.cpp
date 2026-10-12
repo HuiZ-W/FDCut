@@ -14,7 +14,7 @@ std::vector<int> ratio_levels(int n,int i){
 
 int main(int argc,char** argv){
  try{
-  if(argc!=5)throw std::runtime_error("usage: witnessgen GRAPH ENDPOINTS OUTPUT SEED");
+  if(argc!=5)throw std::runtime_error("usage: fdratioe2 GRAPH ENDPOINTS OUTPUT SEED");
   const u64 seed=number(argv[4],"seed");const std::string output=argv[3],parts=output+".parts";
   if(std::filesystem::exists(output))throw std::runtime_error("output exists");
   std::filesystem::create_directories(parts);

@@ -7,7 +7,7 @@
 
 int main(int argc,char** argv){
  try {
-  if(argc!=5)throw std::runtime_error("usage: e3gen GRAPH ENDPOINTS OUTPUT SEED");
+  if(argc!=5)throw std::runtime_error("usage: fde3gen GRAPH ENDPOINTS OUTPUT SEED");
   const u64 seed=number(argv[4],"seed");std::string out=argv[3],parts=out+".parts";
   if(std::filesystem::exists(out))throw std::runtime_error("output exists");
   std::filesystem::create_directories(parts);

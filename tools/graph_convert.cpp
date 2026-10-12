@@ -9,6 +9,10 @@ int main(int argc,char**argv) { try {
     std::string mode=argv[1],input=argv[2],output=argv[3],partial=output+".partial";
     if(std::filesystem::exists(output)||std::filesystem::exists(partial)) throw std::runtime_error("refusing existing output");
     if(mode!="txt-to-bin"&&mode!="bin-to-txt"&&mode!="raw-to-txt") throw std::runtime_error("unknown mode");
+    if(mode=="raw-to-txt") {
+        if(argc!=5&&argc!=6) throw std::runtime_error("raw-to-txt requires N [ascending]");
+        if(argc==6&&std::string(argv[5])!="ascending") throw std::runtime_error("expected ascending");
+    } else if(argc!=4) throw std::runtime_error("conversion requires INPUT OUTPUT only");
     std::ofstream out(partial,std::ios::binary); out.exceptions(std::ios::badbit|std::ios::failbit);
     auto header=[&](fdio::Id n,fdio::Id m){if(mode=="txt-to-bin") {out.write("FDGBIN01",8);fdio::write_u64(out,n);fdio::write_u64(out,m);} else out<<n<<' '<<m<<'\n';};
     std::array<char,1<<20> text_buffer{}; size_t used=0;
@@ -40,7 +44,6 @@ int main(int argc,char**argv) { try {
     if(mode=="txt-to-bin") g=fdio::read_graph_txt(input,header,edge);
     else if(mode=="bin-to-txt") g=fdio::read_graph_bin(input,header,edge);
     else {
-        if(argc!=5&&argc!=6) throw std::runtime_error("raw-to-txt requires N [ascending]");
         std::istringstream ns(argv[4]); auto n=fdio::read_decimal(ns);
         auto bytes=std::filesystem::file_size(input); if(bytes%16) throw std::runtime_error("invalid raw byte count");
         g={n,bytes/16}; header(n,g.edges);
@@ -48,7 +51,7 @@ int main(int argc,char**argv) { try {
         for(fdio::Id i=0;i<g.edges;++i) {
             auto u=fdio::read_u64(in),v=fdio::read_u64(in);
             if(u>=n||v>=n||(i&&(u<pu||(u==pu&&v<=pv)))) throw std::runtime_error("invalid endpoint or nonunique/unsorted edges");
-            if(argc==6&&(std::string(argv[5])!="ascending"||u>=v)) throw std::runtime_error("topological ID certificate failed");
+            if(argc==6&&u>=v) throw std::runtime_error("topological ID certificate failed");
             edge(u,v);pu=u;pv=v;
         }
     }
