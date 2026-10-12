@@ -1,6 +1,6 @@
 import sys,pathlib,tempfile,struct,subprocess,json
 sys.path.insert(0,str(pathlib.Path(__file__).resolve().parents[1]/'scripts'))
-from validate_ir_queries import permuted_rank,vertex_from_rank
+from query_encoding import permuted_rank,vertex_from_rank
 with tempfile.TemporaryDirectory() as d:
  p=pathlib.Path(d);(p/'g').write_bytes(b'FDGBIN01'+struct.pack('<QQQQQQ',12,2,0,1,1,2))
  for anchor in ([],[1,5,8]):

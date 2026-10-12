@@ -2,9 +2,7 @@
 #include <fstream>
 #include <iostream>
 #include <cstdlib>
-#define main unused_ir_generator_main
-#include "generate_ir_queries.cpp"
-#undef main
+#include "query_common.hpp"
 int main(int argc,char** argv){try{
  if(argc!=4&&argc!=5)return 2;
  std::ifstream in(argv[2]);int x,y,ni,nr;if(!(in>>x>>y>>ni>>nr)||ni<0||nr<ni)throw std::runtime_error("bad spec");

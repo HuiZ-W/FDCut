@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Test helper only: not a paper workload or aggregate-budget runner.
 """Plan or materialize deterministic synthetic FD workloads for Benchmark12.
 
 The release graphs contain only topology.  This script deliberately labels its

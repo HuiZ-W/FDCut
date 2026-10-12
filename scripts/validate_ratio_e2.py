@@ -1,5 +1,5 @@
 import collections,hashlib,json,pathlib,struct,sys
-from validate_ir_queries import mix
+from query_encoding import mix
 
 def levels(n,i):
     cap=min(256,(n-2)//i)

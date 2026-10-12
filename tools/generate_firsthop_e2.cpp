@@ -1,8 +1,6 @@
 // Endpoint-guided first-hop candidate pool; full original DAG is never reduced.
 #include "../src/enumerate.cpp"
-#define main unused_ir_generator_main
-#include "generate_ir_queries.cpp"
-#undef main
+#include "query_common.hpp"
 #include <random>
 #include <sstream>
 

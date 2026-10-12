@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Test helper only: not a paper workload or aggregate-budget runner.
 """Run Benchmark12 FD workloads sequentially across exact methods."""
 import argparse
 import hashlib

@@ -170,11 +170,31 @@ Use `./build/fdtool capacity NODES EDGES` to inspect static input limits.
 include/    Public solver and graph-I/O interfaces
 src/        FDCut, comparison methods, kernels and HPF adapter
 tools/      Query generators and graph/IR input utilities
-scripts/    Structural validators and JSONL-to-spec conversion
+scripts/    Current query validators/conversion and raw-data preprocessing
 tests/      Independent small-DAG oracle and regression tests
+  helpers/  Synthetic integration-test workloads and short-timeout runner
 examples/   Small, self-contained inputs
 docs/       Formats, workload semantics and source checksums
 ```
+
+## Current-version boundaries
+
+The default build contains only the current workload entry points: `fdratioe2`
+for ratio E2, `fde3gen` for witness E3, and the explicitly tagged alternative
+`fdfirsthop` sampler. E2 always uses `k = |R| / |I|`. The E3 JSONL `k` field is
+auxiliary `|R|-8` metadata; E3 levels are selected by `percent`, not by this field.
+The guided E2 sampler changes the sampling distribution and must be reported
+separately rather than silently mixed with general-witness queries.
+
+The obsolete difference-based E2 generator and validator are retained only in
+Git history. Current C++ tools share `tools/query_common.hpp`; current Python
+validators share `scripts/query_encoding.py`. Neither shared module contains
+an old workload generator or validator.
+
+`tests/helpers/` contains synthetic integration-test helpers, not experiment
+controllers. Their tiny candidate pools and millisecond timeouts are test
+settings, not the paper workload or per-level time budget. The Python tests
+are not invoked by the C++ solvers and do not enter algorithm timings.
 
 ## Data, scope and licensing
 

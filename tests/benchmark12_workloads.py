@@ -8,8 +8,8 @@ import tempfile
 
 
 binary = str(Path(sys.argv[1]).resolve())
-script = Path(__file__).resolve().parents[1] / "scripts" / "benchmark12_workloads.py"
-runner = Path(__file__).resolve().parents[1] / "scripts" / "run_benchmark12_workloads.py"
+script = Path(__file__).resolve().parent / "helpers" / "make_smoke_workloads.py"
+runner = Path(__file__).resolve().parent / "helpers" / "run_smoke_workloads.py"
 graph_text = "4 3\n0 1\n1 2\n2 3\n"
 
 with tempfile.TemporaryDirectory(prefix="fd-benchmark12-") as directory:

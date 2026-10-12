@@ -1,9 +1,7 @@
 // Standalone experiment tool; reuse the independently implemented constructor.
 // No minimum-cost solver or HPF call is made by this generator.
 #include "../src/enumerate.cpp"
-#define main old_query_generator_main
-#include "generate_ir_queries.cpp"
-#undef main
+#include "query_common.hpp"
 #include <random>
 #include <sstream>
 

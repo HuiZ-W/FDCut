@@ -4,7 +4,7 @@ R = anchor + Feistel permutation of all nonendpoints with anchor skipped.
 Bijectivity plus prefix length proves cardinality/nesting without O(n) expansion.
 """
 import collections, hashlib, json, pathlib, sys
-from validate_ir_queries import permuted_rank, vertex_from_rank
+from query_encoding import permuted_rank, vertex_from_rank
 
 def expand(row):
     rep=row['r_representation']; anchor=rep['anchor']; seen=set(anchor)

@@ -1,9 +1,7 @@
 // E3: fixed |I|=8, witness-anchored nested R at 10..50% of nonendpoints.
 // R is Z followed by a reproducible permutation of nonendpoints, skipping Z.
 #include "../src/enumerate.cpp"
-#define main old_query_generator_main
-#include "generate_ir_queries.cpp"
-#undef main
+#include "query_common.hpp"
 #include <random>
 #include <sstream>
 
