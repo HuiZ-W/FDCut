@@ -182,38 +182,3 @@ tests/      Independent small-DAG oracle and regression tests
 examples/   Small, self-contained inputs
 docs/       Formats, workload semantics and source checksums
 ```
-
-## Current-version boundaries
-
-The default build contains only the current workload entry points: `fdratioe2`
-for ratio E2, `fde3gen` for witness E3, and the explicitly tagged alternative
-`fdfirsthop` sampler. E2 always uses `k = |R| / |I|`. The E3 JSONL `k` field is
-auxiliary `|R|-8` metadata; E3 levels are selected by `percent`, not by this field.
-The guided E2 sampler changes the sampling distribution and must be reported
-separately rather than silently mixed with general-witness queries.
-
-The obsolete difference-based E2 generator and validator are retained only in
-Git history. Current C++ tools share `tools/query_common.hpp`; current Python
-validators share `scripts/query_encoding.py`. Neither shared module contains
-an old workload generator or validator.
-
-`tests/helpers/` contains synthetic integration-test helpers, not experiment
-controllers. Their tiny candidate pools and millisecond timeouts are test
-settings, not the paper workload or per-level time budget. The Python tests
-are not invoked by the C++ solvers and do not enter algorithm timings.
-
-## Data, scope and licensing
-
-Full benchmark graphs and measured results are not bundled. Use only datasets
-you are entitled to redistribute; the synthetic smoke tests are self-contained.
-The source snapshot does not imply that rerunning a generator reproduces every
-paper query: historical seeds, guided-sampling variants, small-graph exceptions
-and selected workload files must also match.
-
-This release does not adopt a blanket open-source license for the research
-code. Third-party notices remain applicable. See [NOTICE.md](NOTICE.md).
-Source checksums are recorded in `docs/SOURCE_SHA256SUMS`.
-
-For double-anonymous review, share an inspected anonymized mirror rather than
-the account-bearing GitHub URL. An anonymous mirror does not remove information
-from an already public source repository.
