@@ -1,4 +1,5 @@
 #include "frontdoor.hpp"
+#include "method_names.hpp"
 #include <algorithm>
 #include <atomic>
 #include <chrono>
@@ -48,12 +49,13 @@ int main(int argc,char** argv) {
       auto begin=std::chrono::steady_clock::now();std::ifstream input(argv[2]);
       if(!input)throw std::runtime_error("cannot open input");
       auto q=fd::read(input);double read_s=std::chrono::duration<double>(std::chrono::steady_clock::now()-begin).count();
-      std::string method=argv[3];
+      const auto selected_method=fd::parse_cli_method(argv[3]);
+      const auto& method=selected_method.internal;const auto& method_label=selected_method.label;
       bool enumeration=method=="enum"||method=="enum-prune"||method=="jenum"||method=="wenum"||method=="wbb";
       if(argc==6&&!enumeration)throw std::runtime_error("limits apply only to enumeration");
       auto limit=[](const char* text){std::string s=text; if(s.empty()||s.find_first_not_of("0123456789")!=std::string::npos)throw std::runtime_error("invalid nonnegative limit");return std::stoull(s);};
       auto a=enumeration?fd::enumerate(q,method,argc==6?limit(argv[4]):0,argc==6?limit(argv[5]):0):fd::solve(q,method);if(!skip_postvalidation&&a.feasible&&!fd::valid_fd(q,a.selected))throw std::runtime_error("original FD witness check failed");
-      std::cout<<"{\"read_s\":"<<read_s<<",\"post_validation\":\""<<(skip_postvalidation?"skipped":"enabled")<<"\",\"query\":";fd::print(std::cout,a,argv[3]);std::cout<<"}\n";return 0;
+      std::cout<<"{\"read_s\":"<<read_s<<",\"post_validation\":\""<<(skip_postvalidation?"skipped":"enabled")<<"\",\"query\":";fd::print(std::cout,a,method_label);std::cout<<"}\n";return 0;
     }
     if(command=="solve-bin-full"&&(argc==7||argc==9)){
       auto vertex=[](const char* text){
@@ -77,12 +79,13 @@ int main(int argc,char** argv) {
       auto begin=std::chrono::steady_clock::now();
       auto q=fd::read_binary_full_domain(argv[2],vertex(argv[3]),vertex(argv[4]),cost(argv[5]));
       double read_s=std::chrono::duration<double>(std::chrono::steady_clock::now()-begin).count();
-      std::string method=argv[6];
+      const auto selected_method=fd::parse_cli_method(argv[6]);
+      const auto& method=selected_method.internal;const auto& method_label=selected_method.label;
       bool enumeration=method=="enum"||method=="enum-prune"||method=="jenum"||method=="wenum"||method=="wbb";
       if(argc==9&&!enumeration)throw std::runtime_error("limits apply only to enumeration");
       auto a=enumeration?fd::enumerate(q,method,argc==9?limit(argv[7]):0,argc==9?limit(argv[8]):0):fd::solve(q,method);
       if(!skip_postvalidation&&a.feasible&&!fd::valid_fd(q,a.selected))throw std::runtime_error("original FD witness check failed");
-      std::cout<<"{\"read_s\":"<<read_s<<",\"post_validation\":\""<<(skip_postvalidation?"skipped":"enabled")<<"\",\"query\":";fd::print(std::cout,a,method);std::cout<<"}\n";return 0;
+      std::cout<<"{\"read_s\":"<<read_s<<",\"post_validation\":\""<<(skip_postvalidation?"skipped":"enabled")<<"\",\"query\":";fd::print(std::cout,a,method_label);std::cout<<"}\n";return 0;
     }
     if(command=="solve-bin-batch"&&argc==6){
       struct BatchQuery { std::uint64_t id; int x,y; fd::i64 cost; };
@@ -108,9 +111,10 @@ int main(int argc,char** argv) {
         queries.push_back({id,static_cast<int>(x),static_cast<int>(y),static_cast<fd::i64>(cost)});
       }
       if(queries.empty())throw std::runtime_error("empty query JSONL");
-      std::string method=argv[5];
+      const auto selected_method=fd::parse_cli_method(argv[5]);
+      const auto& method=selected_method.internal;const auto& method_label=selected_method.label;
       if(method!="base"&&method!="sweep"&&method!="component")
-        throw std::runtime_error("batch solving requires base, sweep, or component");
+        throw std::runtime_error("batch solving requires FDCut (advanced: base or sweep)");
       if(std::filesystem::exists(argv[4]))throw std::runtime_error("refusing existing batch output");
       auto begin=std::chrono::steady_clock::now();
       auto q=fd::read_binary_full_domain(argv[2],queries[0].x,queries[0].y,queries[0].cost);
@@ -134,12 +138,12 @@ int main(int argc,char** argv) {
         solver_s+=answer.total_s;
         output<<"{\"query_id\":"<<item.id<<",\"x\":"<<item.x<<",\"y\":"<<item.y
           <<",\"cost\":"<<item.cost<<",\"graph_read_s\":"<<read_s<<",\"query\":";
-        fd::print(output,answer,method,false);output<<"}\n"<<std::flush;
+        fd::print(output,answer,method_label,false);output<<"}\n"<<std::flush;
         std::cerr<<"completed "<<index+1<<'/'<<queries.size()<<" query_id="<<item.id
           <<" feasible="<<(answer.feasible?"true":"false")<<" total_s="<<answer.total_s<<'\n';
       }
       std::cout<<"{\"status\":\"PASS\",\"queries\":"<<queries.size()
-        <<",\"method\":\""<<method<<"\",\"graph_read_s\":"<<read_s
+        <<",\"method\":\""<<method_label<<"\",\"graph_read_s\":"<<read_s
         <<",\"solver_s\":"<<solver_s<<"}\n";
       return 0;
     }
@@ -157,9 +161,10 @@ int main(int argc,char** argv) {
       if(!count||count>10000||max_attempts<count)
         throw std::runtime_error("invalid query count or maximum attempt count");
       if(cost>=(1ULL<<30))throw std::runtime_error("cost exceeds fast path");
-      std::string method=argv[8];
+      const auto selected_method=fd::parse_cli_method(argv[8]);
+      const auto& method=selected_method.internal;const auto& method_label=selected_method.label;
       if(method!="base"&&method!="sweep"&&method!="component")
-        throw std::runtime_error("sampling requires base, sweep, or component");
+        throw std::runtime_error("sampling requires FDCut (advanced: base or sweep)");
       std::string sampling=argc>=10?argv[9]:"any-x";
       if(sampling!="any-x"&&sampling!="root-x"&&sampling!="random-pair")
         throw std::runtime_error("sampling mode must be any-x, root-x, or random-pair");
@@ -235,7 +240,7 @@ int main(int argc,char** argv) {
                       auto query_id=accepted.fetch_add(1,std::memory_order_relaxed);
                       output<<"{\"query_id\":"<<query_id<<",\"attempt\":"<<ticket+1
                         <<",\"x\":"<<x<<",\"y\":"<<y<<",\"cost\":"<<cost
-                        <<",\"method\":\""<<method<<"\",\"sampling\":\"random-pair\""
+                        <<",\"method\":\""<<method_label<<"\",\"sampling\":\"random-pair\""
                         <<",\"threads\":"<<threads<<",\"nonempty\":true"
                         <<",\"screen\":\"fd-compiler-hard-constraints\",\"feasible\":true}\n"<<std::flush;
                       std::cerr<<"accepted "<<query_id+1<<'/'<<count<<" at ticket "<<ticket+1<<'\n';
@@ -313,7 +318,7 @@ int main(int argc,char** argv) {
         output<<"{\"query_id\":"<<accepted<<",\"attempt\":"<<attempt
           <<",\"x\":"<<x;
         if(mediator>=0)output<<",\"mediator\":"<<mediator;
-        output<<",\"y\":"<<y<<",\"cost\":"<<cost<<",\"method\":\""<<method
+        output<<",\"y\":"<<y<<",\"cost\":"<<cost<<",\"method\":\""<<method_label
           <<"\",\"sampling\":\""<<sampling
           <<"\",\"nonempty\":"<<(sampling=="random-pair"?"true":"false")
           <<",\"screen\":\"fd-compiler-hard-constraints\",\"feasible\":true}\n"<<std::flush;
@@ -385,14 +390,16 @@ int main(int argc,char** argv) {
       std::cout<<"{\"status\":\"PASS\",\"native_configs\":"<<count<<"}\n";return 0;
     }
     std::cout<<"Exact and Scalable Minimum-Cost Front-Door on Causal Graphs\n"
-      <<"fdtool solve INPUT.fdg base|sweep|component|enum|enum-prune|jenum|wenum|wbb [MAX_STATES TIMEOUT_MS]\n"
-      <<"fdtool solve-bin-full GRAPH.bin X Y COST base|sweep|component|enum|enum-prune|jenum|wenum|wbb [MAX_STATES TIMEOUT_MS]\n"
-      <<"fdtool solve-bin-batch GRAPH.bin QUERIES.jsonl OUTPUT.jsonl base|sweep|component\n"
-      <<"fdtool sample-bin-full GRAPH.bin OUTPUT.jsonl COUNT SEED MAX_ATTEMPTS COST base|sweep|component [any-x|root-x|random-pair] [THREADS]\n"
+      <<"fdtool solve INPUT.fdg FDCut|Brute|Prune|ListJ|ListW|PruneW [MAX_STATES TIMEOUT_MS]\n"
+      <<"fdtool solve-bin-full GRAPH.bin X Y COST FDCut|Brute|Prune|ListJ|ListW|PruneW [MAX_STATES TIMEOUT_MS]\n"
+      <<"fdtool solve-bin-batch GRAPH.bin QUERIES.jsonl OUTPUT.jsonl FDCut\n"
+      <<"fdtool sample-bin-full GRAPH.bin OUTPUT.jsonl COUNT SEED MAX_ATTEMPTS COST FDCut [any-x|root-x|random-pair] [THREADS]\n"
       <<"fdtool generate OUTPUT.fdg VARIABLES WIDTH SEED random|middle|corridor|joined\n"
       <<"fdtool benchmark VARIABLES WIDTH SEED REPEATS FAMILY\n"
       <<"fdtool capacity NODES EDGES\n"
-      <<"fdtool selftest\n";
+      <<"fdtool selftest\n"
+      <<"Paper method names are case-insensitive; legacy aliases remain supported.\n"
+      <<"Advanced FDCut configurations: base, sweep.\n";
     return command=="help"||command=="--help"?0:2;
   }catch(const std::exception& e){std::cerr<<"error: "<<e.what()<<'\n';return 2;}
 }

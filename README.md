@@ -38,17 +38,17 @@ cmake -S . -B build -DCMAKE_BUILD_TYPE=Release \
 
 ```bash
 # Weighted example: the optimum is vertex 3, with cost 2.
-./build/fdtool solve examples/tiny.fdg component
+./build/fdtool solve examples/tiny.fdg FDCut
 
 # Run the five comparison methods on the same small query.
-for method in enum enum-prune jenum wenum wbb; do
+for method in Brute Prune ListJ ListW PruneW; do
   ./build/fdtool solve examples/tiny.fdg "$method"
 done
 
 # Convert a topology-only graph and solve an explicit I/R query.
 mkdir -p work
 ./build/graph_convert txt-to-bin examples/tiny.txt work/tiny.bin
-./build/fdsolveir work/tiny.bin examples/tiny.spec component
+./build/fdsolveir work/tiny.bin examples/tiny.spec FDCut
 ```
 
 The topology-only example has uniform costs; its optimum value is 1, unlike
@@ -56,14 +56,21 @@ the weighted FDG example above.
 
 ## Methods
 
-| Paper name | Command-line method | Implementation |
+| Paper name / command-line method | Legacy alias | Implementation |
 |---|---|---|
-| FDCut | `component` | FD compilation, exact reduction, HPF cut and recovery |
-| Brute | `enum` | Subset enumeration with original-DAG feasibility checks |
-| Prune | `enum-prune` | Enumeration with incumbent cost pruning |
-| ListJ | `jenum` | Enumeration using the Jeong et al. constrained constructor |
-| ListW | `wenum` | Enumeration using the Wienöbst et al. constrained constructor |
-| PruneW | `wbb` | Linear-constructor feasibility and cost branch-and-bound |
+| `FDCut` | `component` | FD compilation, exact reduction, HPF cut and recovery |
+| `Brute` | `enum` | Subset enumeration with original-DAG feasibility checks |
+| `Prune` | `enum-prune` | Enumeration with incumbent cost pruning |
+| `ListJ` | `jenum` | Enumeration using the Jeong et al. constrained constructor |
+| `ListW` | `wenum` | Enumeration using the Wienöbst et al. constrained constructor |
+| `PruneW` | `wbb` | Linear-constructor feasibility and cost branch-and-bound |
+
+Use the paper names directly; they are case-insensitive (`FDCut` and `fdcut`
+select the same implementation). Output `query.method` uses the paper spelling
+when a paper name is supplied. Legacy aliases remain supported and retain their
+old output labels, so existing scripts and result grouping do not break. Aliases
+are only name mappings, not separate algorithm versions. The C++ library API
+continues to use its internal IDs.
 
 `base` and `sweep` are additional FDCut-family configurations available through
 `fdtool`. The five comparison methods do not call FDCut's compiler or HPF.
@@ -120,13 +127,13 @@ python3 scripts/validate_witness_e3.py e3.jsonl
 
 # Convert one generated JSONL query into the solver's text specification.
 python3 scripts/query_to_spec.py e2.jsonl 0 work/e2-q0.spec
-./build/fdsolveir graph.bin work/e2-q0.spec component
+./build/fdsolveir graph.bin work/e2-q0.spec FDCut
 
 python3 scripts/query_to_spec.py e3.jsonl 0 work/e3-q0.spec
-./build/fdsolveir graph.bin work/e3-q0.spec component compact
+./build/fdsolveir graph.bin work/e3-q0.spec FDCut compact
 
 # E1 on a topology-only graph, singleton endpoints, uniform cost 1.
-./build/fdtool solve-bin-full graph.bin 0 2 1 component
+./build/fdtool solve-bin-full graph.bin 0 2 1 FDCut
 ```
 
 Generator failures preserve checkpoints and must not be counted as completed

@@ -5,7 +5,7 @@ of causal effects in real observations. Keep the original topology fixed.
 
 ## E1
 
-`fdtool sample-bin-full GRAPH OUTPUT COUNT SEED MAX_ATTEMPTS COST component`
+`fdtool sample-bin-full GRAPH OUTPUT COUNT SEED MAX_ATTEMPTS COST FDCut`
 generates feasible endpoint queries. Optional modes include `root-x` and
 `random-pair`; they have different distributions and must be reported.
 See the CLI source for the exact mode semantics. Generation is feasibility
