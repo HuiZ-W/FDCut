@@ -18,6 +18,32 @@ For an offline build, add
 
 ## Data formats
 
+### Datasets
+
+The paper uses 13 real-world datasets and two synthetic DAGs. Click a dataset
+name for its original source (or generator). Counts below are the experimental
+DAG sizes reported in the paper, after preprocessing where applicable.
+
+| Dataset | Nodes | Edges |
+|---|---:|---:|
+| [COVID (CV)](https://github.com/zidatalab/causalcovid19) | 25 | 78 |
+| [Barley (BA)](https://www.bnlearn.com/bnrepository/discrete-medium.html#barley) | 48 | 84 |
+| [Win95pts (WP)](https://www.bnlearn.com/bnrepository/discrete-large.html#win95pts) | 76 | 112 |
+| [CN-Prec (CP)](https://github.com/IBM/wikicausal/tree/main/data) | 71 | 217 |
+| [CN-Full (CF)](https://github.com/IBM/wikicausal/tree/main/data) | 96 | 461 |
+| [QAL-v2 (QS)](https://github.com/IBM/wikicausal/tree/main/data) | 673 | 741 |
+| [Base-KG (BK)](https://github.com/IBM/wikicausal/tree/main/data/base-kg) | 904 | 808 |
+| [QAL-v1 (QL)](https://github.com/IBM/wikicausal/tree/main/data) | 2,435 | 2,259 |
+| [DD-CKG (DD)](https://github.com/bio-ontology-research-group/Mediation-Analysis-using-Causal-Knowledge-Graph/blob/main/data/DD_CKG.tsv) | 5,520 | 28,454 |
+| [ASER Concept (AC)](https://github.com/HKUST-KnowComp/ASER) | 1,310,917 | 8,657,788 |
+| [CauseNet (CN)](https://causenet.org/) | 12,186,310 | 10,840,656 |
+| [CEG (CE)](https://github.com/eecrazy/CausalBank#download) | 79,708 | 46,359,659 |
+| [CausalBank (CB)](https://nlp.jhu.edu/causalbank/) | 579,968,996 | 311,781,591 |
+| [Layered-Uniform (LU)](tools/generate_large_dag.cpp) | 100,000,000 | 1,200,000,000 |
+| [Layered-Hub (LH)](tools/generate_large_dag.cpp) | 100,000,000 | 1,200,000,000 |
+
+### Formats
+
 Vertex IDs are contiguous and zero-based. Edges are directed; the graph must
 be acyclic, with sorted unique edges and no self-loops.
 
