@@ -66,8 +66,8 @@ with tempfile.TemporaryDirectory(prefix="fd-benchmark12-") as directory:
     assert sorted(vertex_marks) == [1, 2, 8, 8]
 
     values = []
-    for method in ["base", "sweep", "component", "enum", "enum-prune",
-                   "jenum", "wenum", "wbb"]:
+    for method in ["base", "sweep", "FDCut", "Brute", "Prune",
+                   "ListJ", "ListW", "PruneW"]:
         result = json.loads(subprocess.check_output(
             [binary, "solve", str(workload), method], text=True
         ))["query"]

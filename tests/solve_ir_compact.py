@@ -12,7 +12,7 @@ with tempfile.TemporaryDirectory() as d:
   nr=max(6,r.index(1)+1);r=r[:nr]
   (p/'explicit').write_text(f'0 2 1 {nr}\n1\n'+' '.join(map(str,r)))
   (p/'compact').write_text(f'0 2 1 {nr}\n1\n{seed} {len(anchor)}\n'+' '.join(map(str,anchor)))
-  for m in ['component','enum','enum-prune','jenum','wenum','wbb']:
+  for m in ['FDCut','Brute','Prune','ListJ','ListW','PruneW']:
    def solve(name,extra):return json.loads(subprocess.check_output([sys.argv[1],str(p/'g'),str(p/name),m]+extra,timeout=30))['query']
    a=solve('explicit',[]);b=solve('compact',['compact'])
    assert a['value']==b['value']==1 and all(b[k] for k in ['feasible','complete','proven_optimal'])

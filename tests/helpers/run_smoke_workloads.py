@@ -22,7 +22,7 @@ def main():
     parser.add_argument("workload_dir", type=Path)
     parser.add_argument("output_dir", type=Path)
     parser.add_argument("--methods", nargs="+", default=[
-        "base", "sweep", "component", "enum", "enum-prune"
+        "base", "sweep", "FDCut", "Brute", "Prune"
     ])
     parser.add_argument("--include", nargs="*", metavar="DATASET_ID")
     parser.add_argument("--enum-max-states", type=int, default=100_000)
@@ -30,8 +30,8 @@ def main():
     parser.add_argument("--process-timeout-s", type=int, default=0)
     args = parser.parse_args()
     allowed_methods = {
-        "base", "sweep", "component", "enum", "enum-prune",
-        "jenum", "wenum", "wbb",
+        "base", "sweep", "FDCut", "Brute", "Prune",
+        "ListJ", "ListW", "PruneW",
     }
     if not args.methods or set(args.methods) - allowed_methods:
         parser.error("unknown or empty --methods")
@@ -66,7 +66,7 @@ def main():
             expected_set = False
             for method in args.methods:
                 command = [str(args.binary), "solve", str(query), method]
-                if method in {"enum", "enum-prune", "jenum", "wenum", "wbb"}:
+                if method in {"Brute", "Prune", "ListJ", "ListW", "PruneW"}:
                     command += [str(args.enum_max_states), str(args.enum_timeout_ms)]
                 run = subprocess.run(
                     command,

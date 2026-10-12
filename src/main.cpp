@@ -398,7 +398,7 @@ int main(int argc,char** argv) {
       <<"fdtool benchmark VARIABLES WIDTH SEED REPEATS FAMILY\n"
       <<"fdtool capacity NODES EDGES\n"
       <<"fdtool selftest\n"
-      <<"Paper method names are case-insensitive; legacy aliases remain supported.\n"
+      <<"Paper method names are case-insensitive.\n"
       <<"Advanced FDCut configurations: base, sweep.\n";
     return command=="help"||command=="--help"?0:2;
   }catch(const std::exception& e){std::cerr<<"error: "<<e.what()<<'\n';return 2;}

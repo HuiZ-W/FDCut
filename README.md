@@ -56,21 +56,20 @@ the weighted FDG example above.
 
 ## Methods
 
-| Paper name / command-line method | Legacy alias | Implementation |
-|---|---|---|
-| `FDCut` | `component` | FD compilation, exact reduction, HPF cut and recovery |
-| `Brute` | `enum` | Subset enumeration with original-DAG feasibility checks |
-| `Prune` | `enum-prune` | Enumeration with incumbent cost pruning |
-| `ListJ` | `jenum` | Enumeration using the Jeong et al. constrained constructor |
-| `ListW` | `wenum` | Enumeration using the Wienöbst et al. constrained constructor |
-| `PruneW` | `wbb` | Linear-constructor feasibility and cost branch-and-bound |
+| Paper name / command-line method | Implementation |
+|---|---|
+| `FDCut` | FD compilation, exact reduction, HPF cut and recovery |
+| `Brute` | Subset enumeration with original-DAG feasibility checks |
+| `Prune` | Enumeration with incumbent cost pruning |
+| `ListJ` | Enumeration using the Jeong et al. constrained constructor |
+| `ListW` | Enumeration using the Wienöbst et al. constrained constructor |
+| `PruneW` | Linear-constructor feasibility and cost branch-and-bound |
 
 Use the paper names directly; they are case-insensitive (`FDCut` and `fdcut`
-select the same implementation). Output `query.method` uses the paper spelling
-when a paper name is supplied. Legacy aliases remain supported and retain their
-old output labels, so existing scripts and result grouping do not break. Aliases
-are only name mappings, not separate algorithm versions. The C++ library API
-continues to use its internal IDs.
+select the same implementation). Output `query.method` always uses the paper
+spelling for these six methods. Obsolete command-line aliases are not accepted;
+update old scripts to use the names in the table. Internal C++ method IDs are
+implementation details, not additional CLI names or algorithm versions.
 
 `base` and `sweep` are additional FDCut-family configurations available through
 `fdtool`. The five comparison methods do not call FDCut's compiler or HPF.

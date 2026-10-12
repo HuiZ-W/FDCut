@@ -99,8 +99,8 @@ def main(binary):
                     best=c if best is None else min(best,c)
             marks=[int(v in x)+2*int(v in y)+4*int(v in required)+8*int(v in allowed) for v in range(n)]
             path.write_text(f'{n} {len(edges)}\n'+''.join(f'{m} {w}\n' for m,w in zip(marks,weights))+''.join(f'{u} {v}\n' for u,v in edges))
-            methods = ['base','sweep','component','enum','enum-prune',
-                       'jenum','wenum','wbb']
+            methods = ['base','sweep','FDCut','Brute','Prune',
+                       'ListJ','ListW','PruneW']
             for method in methods:
                 run=subprocess.run([binary,'solve',str(path),method],capture_output=True,text=True,check=True)
                 ans=json.loads(run.stdout)['query']

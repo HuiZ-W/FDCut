@@ -17,7 +17,7 @@ with tempfile.TemporaryDirectory() as folder:
         (p/'q.jsonl').write_text(json.dumps(row)+'\n')
         command = [sys.executable, str(script), str(p/'q.jsonl'), '7', str(p/name)]
         subprocess.run(command, check=True)
-        answer = json.loads(subprocess.check_output([sys.argv[1], str(p/'g.bin'), str(p/name), 'component']+extra))['query']
+        answer = json.loads(subprocess.check_output([sys.argv[1], str(p/'g.bin'), str(p/name), 'FDCut']+extra))['query']
         assert answer['value'] == 1
         assert all(answer[k] for k in ['feasible', 'complete', 'proven_optimal'])
         assert subprocess.run(command, capture_output=True).returncode != 0

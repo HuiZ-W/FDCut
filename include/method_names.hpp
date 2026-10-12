@@ -12,7 +12,7 @@ struct CliMethod {
 };
 
 // CLI naming only: the solver implementations and their internal IDs stay fixed.
-// Preserve legacy output labels for existing scripts that aggregate by method.
+// Only paper names are public; internal IDs are not accepted as aliases.
 inline CliMethod parse_cli_method(const std::string& name) {
   struct Names { const char* paper; const char* internal; };
   static const Names names[] = {
@@ -26,7 +26,6 @@ inline CliMethod parse_cli_method(const std::string& name) {
   };
   const auto key = lowercase(name);
   for (const auto& entry : names) {
-    if (name == entry.internal) return {entry.internal, entry.internal};
     if (key == lowercase(entry.paper)) return {entry.internal, entry.paper};
   }
   throw std::runtime_error("unknown method: " + name +

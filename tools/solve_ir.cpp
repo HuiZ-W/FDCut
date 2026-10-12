@@ -7,7 +7,7 @@
 int main(int argc,char** argv){try{
  if((argc==2&&std::string(argv[1])=="--help")||(argc!=4&&argc!=5)){
   std::cerr<<"fdsolveir GRAPH.bin QUERY.spec FDCut|Brute|Prune|ListJ|ListW|PruneW [compact]\n"
-           <<"Paper names are case-insensitive; legacy aliases remain supported.\n";
+           <<"Paper method names are case-insensitive.\n";
   return argc==2&&std::string(argv[1])=="--help"?0:2;
  }
  std::ifstream in(argv[2]);int x,y,ni,nr;if(!(in>>x>>y>>ni>>nr)||ni<0||nr<ni)throw std::runtime_error("bad spec");

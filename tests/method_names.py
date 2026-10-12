@@ -1,4 +1,4 @@
-"""Paper names and legacy aliases must select identical implementations."""
+"""Paper-name spelling variants agree; obsolete CLI aliases are rejected."""
 import json
 from pathlib import Path
 import struct
@@ -34,22 +34,22 @@ with tempfile.TemporaryDirectory() as directory:
     for paper, legacy in names:
         for factory in factories:
             answers = []
-            for supplied in (paper, paper.lower(), paper.upper(), legacy):
+            for supplied in (paper, paper.lower(), paper.upper()):
                 answer = run(factory(supplied))['query']
-                assert answer['method'] == (legacy if supplied == legacy else paper)
+                assert answer['method'] == paper
                 assert all(answer[k] for k in ('feasible', 'complete', 'proven_optimal'))
                 answers.append({k: answer[k] for k in keys})
             assert all(answer == answers[0] for answer in answers)
         if paper != 'FDCut':
             for command in (factories[0], factories[1]):
                 a = run(command(paper) + ['1', '0'])['query']
-                b = run(command(legacy) + ['1', '0'])['query']
+                b = run(command(paper.lower()) + ['1', '0'])['query']
                 assert {k: a[k] for k in keys} == {k: b[k] for k in keys}
 
     (p / 'queries').write_text('{"query_id":0,"x":0,"y":2,"cost":1}\n')
     samples = []
-    for supplied in ('FDCut', 'fdcut', 'component'):
-        label = 'component' if supplied == 'component' else 'FDCut'
+    for supplied in ('FDCut', 'fdcut', 'FDCUT'):
+        label = 'FDCut'
         out = p / f'batch-{supplied}'
         summary = run([tool, 'solve-bin-batch', str(graph), str(p / 'queries'), str(out), supplied])
         assert summary['method'] == label
@@ -61,6 +61,7 @@ with tempfile.TemporaryDirectory() as directory:
         samples.append(sample)
     assert samples[0] == samples[1] == samples[2]
     for factory in factories:
-        failed = subprocess.run(factory('not-a-method'), capture_output=True, text=True)
-        assert failed.returncode != 0 and 'unknown method' in failed.stderr
-print('PASS paper names, case handling, legacy labels, limits, explicit/compact I/R, batch and sampling')
+        for invalid in ['not-a-method'] + [legacy for _, legacy in names]:
+            failed = subprocess.run(factory(invalid), capture_output=True, text=True)
+            assert failed.returncode != 0 and 'unknown method' in failed.stderr
+print('PASS paper names, case handling, rejected legacy aliases, limits, explicit/compact I/R, batch and sampling')
